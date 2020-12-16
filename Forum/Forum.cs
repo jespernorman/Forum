@@ -5,11 +5,12 @@ namespace Forum
 {
     public class Forum
     {
-        public int Forum_Id { get; set; }
-        public string Forum_Name { get; set; }
-        public DateTime Create_Date { get; set; }
+        public int ForumId { get; set; }
+        public string ForumName { get; set; }
+        public DateTime CreateDate { get; set; }
 
-        private const string _connectionString = "Data Source=.//Forum.db";
+        private const string _connectionString =
+            "Data Source=/Users/jespernorman/Projects/workspace/oop_csharp/Forum/Database/Forum.db";
 
         public Forum()
         {
@@ -18,19 +19,58 @@ namespace Forum
 
         public Forum GetThreds()
         {
-            using var connection = new SqliteConnection(_connectionString);
-            var query = "SELECT * FROM Forum WHERE Forum";
+            //using var connection = new SqliteConnection(_connectionString);
+            //var query = "SELECT * FROM Forum";
 
-            return connection.QuerySingle<Forum>(query);
+            //var dataFromForum = connection.QuerySingle<Forum>(query);
+
+            //return dataFromForum;
+
+            //string connStr = "server=localhost;user=root;database=world;port=3306;password=******";
+
+            var forumId = 1;
+            var forum = new Forum();
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM Forum
+                    WHERE Forum_Id = $id
+                ";
+
+                command.Parameters.AddWithValue("$id", forumId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var id = reader.GetString(0);
+                        var name = reader.GetString(1);
+                        var createDate = reader.GetString(2);
+
+                        forum.ForumId = int.Parse(id);
+                        forum.ForumName = name;
+                        forum.CreateDate = DateTime.Parse(createDate);
+
+                    }
+                }
+            }
+
+            return forum;
+
         }
 
         public void CreateThread()
         {
-            Forum_Id = 1;
+            ForumId = 1;
             Console.WriteLine("Vad ska din tråd heta?");
-            Forum_Name = Console.ReadLine();
-            Create_Date.TimeOfDay();///VET INTE HUR MAN GÖÖÖÖÖR
-
+            ForumName = Console.ReadLine();
+            CreateDate = DateTime.Now;
         }
     }
 }

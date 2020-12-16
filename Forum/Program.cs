@@ -10,6 +10,9 @@ namespace Forum
         {
             var databasemanager = new DatabaseManager();
             var forum = new Forum();
+
+            var test = forum.GetThreds();
+
             var post = new Post();
             var user = new User();
 
