@@ -15,7 +15,7 @@ namespace Forum
 
             databasemanager.GetData();
 
-            //post.GetPost();
+            post.GetPost();
 
             user.GetUser();
 
