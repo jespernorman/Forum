@@ -20,11 +20,26 @@ namespace Forum
 
         public Post GetPost()
         {
-
             using var connection = new SqliteConnection(_connectionString);
             var query = "SELECT * FROM Post WHERE Post";
 
             return connection.QuerySingle<Post>(query);
+        }
+
+        public void CreatePost()
+        {
+            if(Forum_Id != null)
+            {
+                Console.WriteLine("Skriv in vad du vill posta");
+                Post_text = Console.ReadLine();
+               // Post_Id;?
+               // Create_Date;?
+            }
+            else
+            {
+                Console.WriteLine("Tråden existerar inte");
+            }
+
         }
     }
 }

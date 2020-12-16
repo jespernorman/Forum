@@ -13,12 +13,33 @@ namespace Forum
             var post = new Post();
             var user = new User();
 
-            databasemanager.GetData();
+            //databasemanager.GetData();
+            //post.GetPost();
+            //user.GetUser();
 
-            post.GetPost();
+            Console.WriteLine("Hej! välkommen till detta forum.");
 
-            user.GetUser();
+            while (false)
+            {
+                Console.WriteLine("Tryck 1 för att logga in");
+                Console.WriteLine("Tryck 2 för att skapa ett konto");
+                string inmatning = (Console.ReadLine());
 
+                if (inmatning == "1")
+                {
+                    user.Login();
+                    continue;
+                }
+                if (inmatning == "2")
+                {
+                    user.CreateUser();
+                    continue;
+                }
+                else
+                {
+                    Console.WriteLine("Det du matade in var inte giltigt.");
+                }
+            }
         }
     }
 }
