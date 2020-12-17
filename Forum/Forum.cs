@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dapper;
 using Microsoft.Data.Sqlite;
 namespace Forum
@@ -8,6 +9,8 @@ namespace Forum
         public int ForumId { get; set; }
         public string ForumName { get; set; }
         public DateTime CreateDate { get; set; }
+
+        public List<Forum> ListAllForum = new List<Forum>();
 
         private const string _connectionString =
             "Data Source=/Users/jespernorman/Projects/workspace/oop_csharp/Forum/Database/Forum.db";
@@ -56,7 +59,7 @@ namespace Forum
                         forum.ForumId = int.Parse(id);
                         forum.ForumName = name;
                         forum.CreateDate = DateTime.Parse(createDate);
-
+                        ListAllForum.Add(forum);
                     }
                 }
             }

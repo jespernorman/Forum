@@ -8,6 +8,7 @@ namespace Forum
     {
         static void Main(string[] args)
         {
+
             var databasemanager = new DatabaseManager();
             var forum = new Forum();
 
@@ -42,7 +43,7 @@ namespace Forum
                 {
                     Console.WriteLine("Det du matade in var inte giltigt.");
                 }
+
             }
         }
-    }
 }

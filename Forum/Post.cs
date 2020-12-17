@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
@@ -6,10 +7,13 @@ namespace Forum
 {
     public class Post
     {
-        public int Post_Id { get; set; }
-        public int Forum_Id { get; set; }
-        public string Post_text { get; set; }
-        public DateTime Create_Date { get; set; }
+        public int PostId { get; set; }
+        public int ForumId { get; set; }
+        public string PostText { get; set; }
+        public DateTime CreateDate { get; set; }
+
+        public List<Post> ListAllPost = new List<Post>();
+        public List<User> UserList = new List<User>();
 
         private const string _connectionString = "Data Source=.//Forum.db";
 
@@ -20,20 +24,55 @@ namespace Forum
 
         public Post GetPost()
         {
-            using var connection = new SqliteConnection(_connectionString);
-            var query = "SELECT * FROM Post WHERE Post";
+            //using var connection = new SqliteConnection(_connectionString);
+            //var query = "SELECT * FROM Post WHERE Post";
 
-            return connection.QuerySingle<Post>(query);
-        }
+            //return connection.QuerySingle<Post>(query);
+            var post = new Post();
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM Post
+                    WHERE Forum_Id = $id
+                ";
+
+                command.Parameters.AddWithValue("$id", PostId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var id = reader.GetString(0);
+                        var forumid = reader.GetString(1);
+                        var posttext = reader.GetString(2);
+                        var createDate = reader.GetString(3);
+
+                        post.PostId = int.Parse(id);
+                        post.ForumId = int.Parse(forumid);
+                        post.PostText = posttext;
+                        post.CreateDate = DateTime.Parse(createDate);
+                        ListAllPost.Add(post);
+                    }
+                }
+
+                return post;
+            }
 
         public void CreatePost()
         {
-            if(Forum_Id != null)
+            var post = new Post();
+            if (ForumId != null)
             {
                 Console.WriteLine("Skriv in vad du vill posta");
-                Post_text = Console.ReadLine();
-               // Post_Id;?
-               // Create_Date;?
+                Posttext = Console.ReadLine();
+                // Post_Id;?
+                post.CreateDate = DateTime.Parse(CreateDate);
             }
             else
             {
