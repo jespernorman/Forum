@@ -8,16 +8,21 @@ namespace Forum
     {
         static void Main(string[] args)
         {
-
-            var databasemanager = new DatabaseManager();
             var forum = new Forum();
 
-            var test = forum.GetThreds();
+            //Testar att lista ut alla forum från databasen
+            var forums = forum.GetForums();
 
+            Console.WriteLine("Listar alla forum:");
+
+            foreach (var _forum in forums)
+            {
+                Console.WriteLine("Forum Id: " + _forum.ForumId.ToString() + " forum namn: " + _forum.ForumName + " forumet är skapat: " + _forum.CreateDate);
+            }
+            
             var post = new Post();
             var user = new User();
 
-            //databasemanager.GetData();
             //post.GetPost();
             //user.GetUser();
 
@@ -43,7 +48,7 @@ namespace Forum
                 {
                     Console.WriteLine("Det du matade in var inte giltigt.");
                 }
-
             }
         }
+    }
 }

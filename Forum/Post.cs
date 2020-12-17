@@ -63,21 +63,23 @@ namespace Forum
 
                 return post;
             }
+        }
+           
 
         public void CreatePost()
         {
-            var post = new Post();
-            if (ForumId != null)
-            {
-                Console.WriteLine("Skriv in vad du vill posta");
-                Posttext = Console.ReadLine();
-                // Post_Id;?
-                post.CreateDate = DateTime.Parse(CreateDate);
-            }
-            else
-            {
-                Console.WriteLine("Tråden existerar inte");
-            }
+            //var post = new Post();
+            //if (ForumId != null)
+            //{
+            //    Console.WriteLine("Skriv in vad du vill posta");
+            //    Posttext = Console.ReadLine();
+            //    // Post_Id;?
+            //    post.CreateDate = DateTime.Parse(CreateDate);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Tråden existerar inte");
+            //}
 
         }
     }

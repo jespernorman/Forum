@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dapper;
 using Microsoft.Data.Sqlite;
 namespace Forum
 {
@@ -10,31 +9,24 @@ namespace Forum
         public string ForumName { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public List<Forum> ListAllForum = new List<Forum>();
-
-        private const string _connectionString =
-            "Data Source=/Users/jespernorman/Projects/workspace/oop_csharp/Forum/Database/Forum.db";
+        private const string _connectionString = "/Users/tomnor/projects/Forum/Forum/Database/Forum.db";
 
         public Forum()
         {
 
         }
 
-        public Forum GetThreds()
+        public List<Forum> GetForums()
         {
-            //using var connection = new SqliteConnection(_connectionString);
-            //var query = "SELECT * FROM Forum";
 
-            //var dataFromForum = connection.QuerySingle<Forum>(query);
+            var listOfForums = new List<Forum>();
 
-            //return dataFromForum;
-
-            //string connStr = "server=localhost;user=root;database=world;port=3306;password=******";
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = "/Users/tomnor/projects/Forum/Forum/Database/Forum.db";
 
             var forumId = 1;
-            var forum = new Forum();
-
-            using (var connection = new SqliteConnection(_connectionString))
+            
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
 
@@ -43,15 +35,23 @@ namespace Forum
                 @"
                     SELECT *
                     FROM Forum
-                    WHERE Forum_Id = $id
                 ";
 
-                command.Parameters.AddWithValue("$id", forumId);
+                //command.CommandText =
+                //@"
+                //    SELECT *
+                //    FROM Forum
+                //    WHERE Forum_Id = $id
+                //";
+
+                //command.Parameters.AddWithValue("$id", forumId);
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
+                        var forum = new Forum();
+
                         var id = reader.GetString(0);
                         var name = reader.GetString(1);
                         var createDate = reader.GetString(2);
@@ -59,12 +59,13 @@ namespace Forum
                         forum.ForumId = int.Parse(id);
                         forum.ForumName = name;
                         forum.CreateDate = DateTime.Parse(createDate);
-                        ListAllForum.Add(forum);
+
+                        listOfForums.Add(forum);
                     }
                 }
             }
 
-            return forum;
+            return listOfForums;
 
         }
 
