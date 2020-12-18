@@ -80,10 +80,6 @@ namespace Forum
             }
             else
             {
- 
-                userName = UserName;
-                passWord = PassWord;
-
                 using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
                 {
                     connection.Open();
@@ -92,7 +88,7 @@ namespace Forum
                     {
                         var insertCmd = connection.CreateCommand();
 
-                        insertCmd.CommandText = "INSERT INTO User(UserName, PassWord, Create_Date) values('" + this.UserName + "', '" + this.PassWord + "', '" + this.CreateDate + "'); ";
+                        insertCmd.CommandText = "INSERT INTO User(userName, passWord, Create_Date) values('" + userName + "', '" + passWord + "', '" + DateTime.Now + "'); ";
                         insertCmd.ExecuteNonQuery();
 
                         transaction.Commit();
