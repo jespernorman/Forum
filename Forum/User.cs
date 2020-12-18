@@ -8,33 +8,74 @@ namespace Forum
 {
     public class User
     {
-        public int User_Id { get; set; }
+        public int UserId { get; set; }
         public string UserName { get; set; }
         private string Password { get; set; }
         public bool IsAdmin { get; set; }
+        public DateTime CreateDate { get; set; }
 
         public List<User> UserList = new List<User>();
 
-        private const string _connectionString = "Data Source=.//Forum.db";
+        private string DBPath { get; set; }
 
         public User()
         {
-          
+
         }
 
-        public User GetAllUsers()
+        public User(string dbPath)
         {
-            using var connection = new SqliteConnection(_connectionString);
-            var query = "SELECT * FROM User WHERE User";
+            DBPath = dbPath;
+            LoadAllUsers();
+        }
 
-            return connection.QuerySingle<User>(query);
+        public void LoadAllUsers()
+        {
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM User
+                ";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var user = new User();
+
+                        var userId = reader.GetString(0);
+                        var userName = reader.GetString(1);
+                        var password = reader.GetString(2);
+                        var isAdmin = reader.GetString(3);
+                        var createDate = reader.GetString(4);
+                        
+
+                        user.UserId = int.Parse(userId);
+                        user.UserName = userName;
+                        user.Password = password;
+                        user.IsAdmin = Convert.ToBoolean(int.Parse(isAdmin));
+                        user.CreateDate = DateTime.Parse(createDate);
+
+                        UserList.Add(user);
+                    }
+                }
+            }
         }
 
         public void CreateUser()
         {
 
             Console.WriteLine("skriv in User id");
-            User_Id = int.Parse(Console.ReadLine());
+            UserId = int.Parse(Console.ReadLine());
 
             Console.WriteLine("skriv in användar namn");
             UserName = Console.ReadLine();

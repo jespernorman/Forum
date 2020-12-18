@@ -9,28 +9,30 @@ namespace Forum
     {
         public int PostId { get; set; }
         public int ForumId { get; set; }
+        public int UserId { get; set; }
         public string PostText { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public List<Post> ListAllPost = new List<Post>();
-        public List<User> UserList = new List<User>();
-
-        private const string _connectionString = "Data Source=.//Forum.db";
+        private string DBPath { get; set; }
 
         public Post()
         {
 
         }
 
-        public Post GetPost()
+        public Post(string dbPath)
         {
-            //using var connection = new SqliteConnection(_connectionString);
-            //var query = "SELECT * FROM Post WHERE Post";
+            DBPath = dbPath;
+        }
 
-            //return connection.QuerySingle<Post>(query);
-            var post = new Post();
+        public List<Post> GetPosts()
+        {
+            var listOfPosts = new List<Post>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
 
@@ -39,48 +41,56 @@ namespace Forum
                 @"
                     SELECT *
                     FROM Post
-                    WHERE Forum_Id = $id
                 ";
-
-                command.Parameters.AddWithValue("$id", PostId);
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        var id = reader.GetString(0);
-                        var forumid = reader.GetString(1);
-                        var posttext = reader.GetString(2);
-                        var createDate = reader.GetString(3);
+                        var post = new Post();
 
-                        post.PostId = int.Parse(id);
-                        post.ForumId = int.Parse(forumid);
-                        post.PostText = posttext;
-                        post.CreateDate = DateTime.Parse(createDate);
-                        ListAllPost.Add(post);
+                        var postId = reader.GetString(0);
+                        var forumId = reader.GetString(1);
+                        var postText = reader.GetString(2);
+                        var createDate = reader.GetString(3);
+                        var userId = reader.GetString(4);
+
+                        post.PostId = int.Parse(postId);
+                        post.ForumId = int.Parse(forumId);
+                        post.UserId = int.Parse(userId);
+                        post.PostText = postText;
+                        post.CreateDate = DateTime.Parse(createDate); 
+
+                        listOfPosts.Add(post);
                     }
                 }
-
-                return post;
             }
+
+            return listOfPosts;
         }
            
 
         public void CreatePost()
         {
-            //var post = new Post();
-            //if (ForumId != null)
-            //{
-            //    Console.WriteLine("Skriv in vad du vill posta");
-            //    Posttext = Console.ReadLine();
-            //    // Post_Id;?
-            //    post.CreateDate = DateTime.Parse(CreateDate);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Tråden existerar inte");
-            //}
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                //Insert data:
+                using (var transaction = connection.BeginTransaction())
+                {
+                    var insertCmd = connection.CreateCommand();
+
+                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, User_Id, Post_Text, Create_Date) values('" + this.ForumId+ "', '" + this.UserId + "', '" + this.PostText + "', '" + this.CreateDate + "'); ";
+                    insertCmd.ExecuteNonQuery();
+
+                    transaction.Commit();
+                }
+            }
         }
+
     }
 }

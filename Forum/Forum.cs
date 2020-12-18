@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
+
 namespace Forum
 {
     public class Forum
@@ -9,11 +10,16 @@ namespace Forum
         public string ForumName { get; set; }
         public DateTime CreateDate { get; set; }
 
-        private const string _connectionString = "/Users/tomnor/projects/Forum/Forum/Database/Forum.db";
+        private string DBPath { get; set; }
 
         public Forum()
         {
 
+        }
+
+        public Forum(string dbPath)
+        {
+            DBPath = dbPath;
         }
 
         public List<Forum> GetForums()
@@ -22,9 +28,7 @@ namespace Forum
             var listOfForums = new List<Forum>();
 
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = "/Users/tomnor/projects/Forum/Forum/Database/Forum.db";
-
-            var forumId = 1;
+            connectionStringBuilder.DataSource = DBPath;
             
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
