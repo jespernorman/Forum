@@ -40,7 +40,7 @@ namespace Forum
                 command.CommandText =
                 @"
                       SELECT *
-                      FROM Forum
+                      FROM  Post
                       WHERE Forum_Id = $id
                 ";
                 command.Parameters.AddWithValue("$id", chosenForumId);
@@ -72,7 +72,7 @@ namespace Forum
         }
 
 
-        public void CreatePost(string PostText)
+        public void CreatePost(Forum forum, User user , string postText)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -86,7 +86,7 @@ namespace Forum
                 {
                     var insertCmd = connection.CreateCommand();
 
-                    insertCmd.CommandText = "INSERT INTO Post(Post_Id, Forum_Id, Post_Text, Create_Date, User_Id,) values('" + this.PostId+ "', '" + this.ForumId+ "', '" + this.PostText + "', '" + this.CreateDate + "', '" + this.UserId + "'); ";
+                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId+ "', '" + postText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
                     insertCmd.ExecuteNonQuery();
 
                     transaction.Commit();

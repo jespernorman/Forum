@@ -62,11 +62,10 @@ namespace Forum
 
         }
 
-        public void CreateForum(string forumName)
+        public void CreateForum(string forumName, User user)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
-            forumName = ForumName;
 
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
@@ -77,7 +76,7 @@ namespace Forum
                 {
                     var insertCmd = connection.CreateCommand();
 
-                    insertCmd.CommandText = "INSERT INTO Forum(Forum_Id, Forum_Name, User_Id, Create_Date) values('" + this.ForumId + "', '" + this.ForumName + "', '" + this.UserId + "', '" + this.CreateDate + "'); ";
+                    insertCmd.CommandText = "INSERT INTO Forum(Forum_Name, User_Id, Create_Date) values('" + forumName + "', '" + user.UserId + "', '" + DateTime.Now + "'); ";
                     insertCmd.ExecuteNonQuery();
 
                     transaction.Commit();

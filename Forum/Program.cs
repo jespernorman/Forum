@@ -13,41 +13,22 @@ namespace Forum
 
         static void Main(string[] args)
         {
-
-            ////Testar att lista ut alla poster från databasen
-            //var post = new Post(dbPath);
-            //var posts = post.GetPosts(1);
-
-            ////Console.WriteLine("Listar alla poster:");
-
- 
-
-            ////Lägg till post
-            //var newPost = new Post(dbPath);
-            //newPost.UserId = 1;
-            //newPost.ForumId = 1;
-            //newPost.CreateDate = DateTime.Now;
-            //newPost.PostText = "Hej Jeppe läget???";
-            //newPost.CreatePost();
-
-            ////Hämta användare baserat på användar namn och lösen ord
-            ////var user = new User(dbPath);
-
-
             Console.WriteLine("Hej! Välkommen till detta forum.");
             var forum = new Forum(dbPath);
-            var post = new Post();
-            
+            var post = new Post(dbPath);    
             var user = new User(dbPath);
             user.LoadAllUsers();
 
             string userName;
             string passWord;
+
+            var exitCommand = false;
             
-            while (!user.Login(userName, passWord || user.CreateUser(userName, passWord))
+            while (exitCommand != true)
             {
                 Console.WriteLine("Tryck 1 för att logga in");
                 Console.WriteLine("Tryck 2 för att skapa ett konto");
+                Console.WriteLine("Tryck x för att avsluta");
                 string inmatning = Console.ReadLine();
 
                 if (inmatning == "1")
@@ -65,6 +46,9 @@ namespace Forum
                     else
                     {
                         Console.WriteLine("Du är nu inloggad.");
+
+                        HandleForum(user,forum, post);
+
                     }
 
                     continue;
@@ -84,15 +68,20 @@ namespace Forum
 
                     continue;
                 }
-
+                else if (inmatning == "x")
+                {
+                    exitCommand = true;
+                    continue;
+                }
                 else
                 {
-                    Console.WriteLine("Det du matade in var inte giltigt.");
+                    Console.WriteLine("Det du matade in var inte giltigt, pröva igen!");
                 }
             }
+        }
 
-            Console.WriteLine("Du är nu inloggad, Tryck x för att avsluta och logga ut.");
-
+        public static void HandleForum(User user, Forum forum, Post post)
+        {
             string forumIdInmatning = "";
             int chosenForumId = 0;
 
@@ -106,54 +95,67 @@ namespace Forum
                 {
                     Console.WriteLine("Forum Id: " + _forum.ForumId.ToString() + " forum namn: " + _forum.ForumName + " forumet är skapat: " + _forum.CreateDate);
                 }
-           
-                Console.WriteLine("Välj vilken tråd du vill öppna med att mata in forum Id:t");
-                Console.WriteLine("Om du vill skapa en ny tråd tryck 2");
 
-                forumIdInmatning = Console.ReadLine();
-                chosenForumId = int.Parse(forumIdInmatning);
+                Console.WriteLine("Välj 1 om du vill skriva i befintlig tråd, välj 2 om du vill skapa en ny");
 
-                if (forum.listOfForums.Any(x => x.ForumId == chosenForumId))                   
+                var val = Console.ReadLine();
+
+                if (int.Parse(val) == 1)
                 {
-                    while(forumIdInmatning != "x")
+                    Console.WriteLine("Välj vilken tråd du vill öppna med att mata in forum Id:t");
+                    forumIdInmatning = Console.ReadLine();
+                    chosenForumId = int.Parse(forumIdInmatning);
+
+                    if (forum.listOfForums.Any(x => x.ForumId == chosenForumId))
                     {
-                        forum.listOfForums.FirstOrDefault(x => x.ForumId == chosenForumId);
+                        while (forumIdInmatning != "b")
+                        {
+                            var choosenForum = forum.listOfForums.FirstOrDefault(x => x.ForumId == chosenForumId);
 
-                        post.GetPosts(chosenForumId);
+                            var listOfPosts = post.GetPosts(chosenForumId);
 
-                        Console.WriteLine("Tryck 1 om du vill lägga till en post i tråden, b för att backa.");
-                        string addPostCommand = Console.ReadLine();
+                            foreach (var _post in listOfPosts)
+                            {
+                                Console.WriteLine("Forum Id: " + _post.ForumId.ToString() + " post text: " + _post.PostText + " posten är skapat: " + _post.CreateDate + " av userid:" + _post.UserId.ToString());
+                            }
 
-                        if (addPostCommand == "x")
-                        {
-                            Environment.Exit(0);
-                        }
-                        if (addPostCommand == "b")
-                        {
-                            continue;
-                        }
-                        if (addPostCommand == "1")
-                        {
-                            Console.WriteLine("Mata in det du vill skriva i tråden");
-                            string PostText = Console.ReadLine();
-                            post.CreatePost(PostText);
-                            Console.WriteLine("Din post är nu postad!");
-                            continue;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Det du matade in var inte giltigt");
-                           
+                            Console.WriteLine("Tryck 1 om du vill lägga till en post i tråden, b för att backa till föregående menu och x för att avsluta");
+
+                            var addPostCommand = Console.ReadLine();
+
+                            if (addPostCommand == "x")
+                            {
+                                Environment.Exit(0);
+                            }
+                            if (addPostCommand == "b")
+                            {
+                                forumIdInmatning = "b";
+                                continue;
+                            }
+                            if (addPostCommand == "1")
+                            {
+                                Console.WriteLine("Mata in det du vill skriva i tråden");
+                                string PostText = Console.ReadLine();
+                                post.CreatePost(choosenForum, user, PostText);
+                                Console.WriteLine();
+                                Console.WriteLine();
+                                Console.WriteLine("Din post är nu postad!");
+                                continue;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Det du matade in var inte giltigt");
+
+                            }
                         }
                     }
                 }
-
-                else if(chosenForumId == 2)
+                else if (int.Parse(val) == 2)
                 {
                     Console.WriteLine("Vad ska tråden heta?");
                     string forumName = Console.ReadLine();
 
-                    forum.CreateForum(forumName);
+                    forum.CreateForum(forumName, user);
                     Console.WriteLine("Din tråd är nu skapad! :)");
 
                     continue;
@@ -163,32 +165,7 @@ namespace Forum
                     Console.WriteLine("Det du matade in var inte giltigt. :)");
 
                 }
-
             }
-
-            //Console.WriteLine("Tryck 1 om du vill lägga till en post i tråden");
-            //string addPostCommand = Console.ReadLine();
-            
-            //if (addPostCommand == "x")
-            //{
-            //    Environment.Exit(0);
-            //}
-            //if (addPostCommand == "1")
-            //{
-            //    Console.WriteLine("Mata in det du vill skriva");
-            //    string PostText = Console.ReadLine(); 
-            //    post.CreatePost(PostText);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Det du matade in var inte giltigt");
-            //}
-
-            //var posts = post.GetPosts(chosenForumId);
-            //foreach (var _post in posts)
-            //{
-            //    Console.WriteLine("Post Id:" + _post.PostId + "Forum Id: " + _post.ForumId + "user Id: " + _post.UserId + " inlägg: " + _post.PostText + " post är skapat: " + _post.CreateDate);
-            //}
         }
     }
 }

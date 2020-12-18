@@ -109,6 +109,11 @@ namespace Forum
 
             if (UserList.Any(x => x.UserName == userName && x.PassWord == passWord))
             {
+                var loggedInUser = UserList.FirstOrDefault(x => x.UserName == userName && x.PassWord == passWord);
+                // Set the properties with the logged in user
+                this.UserId = loggedInUser.UserId;
+                this.CreateDate = loggedInUser.CreateDate;
+                this.UserName = loggedInUser.UserName;
                 return true;                
             }
             else
