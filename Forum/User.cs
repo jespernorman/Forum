@@ -10,8 +10,7 @@ namespace Forum
     {
         public int UserId { get; set; }
         public string UserName { get; set; }
-        private string Password { get; set; }
-        public bool IsAdmin { get; set; }
+        private string PassWord { get; set; }
         public DateTime CreateDate { get; set; }
 
         public List<User> UserList = new List<User>();
@@ -55,14 +54,12 @@ namespace Forum
                         var userId = reader.GetString(0);
                         var userName = reader.GetString(1);
                         var password = reader.GetString(2);
-                        var isAdmin = reader.GetString(3);
-                        var createDate = reader.GetString(4);
+                        var createDate = reader.GetString(3);
                         
 
                         user.UserId = int.Parse(userId);
                         user.UserName = userName;
-                        user.Password = password;
-                        user.IsAdmin = Convert.ToBoolean(int.Parse(isAdmin));
+                        user.PassWord = password;
                         user.CreateDate = DateTime.Parse(createDate);
 
                         UserList.Add(user);
@@ -71,48 +68,53 @@ namespace Forum
             }
         }
 
-        public void CreateUser()
+        public bool CreateUser(string userName, string passWord)
         {
+            var user = new User();
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
-            Console.WriteLine("skriv in User id");
-            UserId = int.Parse(Console.ReadLine());
-
-            Console.WriteLine("skriv in användar namn");
-            UserName = Console.ReadLine();
-
-            Console.WriteLine("skriv in ett lösenord");
-            Password = Console.ReadLine();
-
-            Console.WriteLine("Ska användaren ha admin behörigheter? (Ja/Nej)");
-            string isAdmin = Console.ReadLine();
-        }
-
-        public bool Login()
-        {
-            Console.WriteLine("Skriv in användarnamn");
-            string username = Console.ReadLine();
-
-            Console.WriteLine("Skriv in lösenord");
-            string password = Console.ReadLine();
-
-            if (UserList.Any(x => x.UserName == username))
+            if (UserList.Any(x => x.UserName == UserName))
             {
-                UserList.FirstOrDefault((x => x.UserName == username));
-                if (Password == password)
-                {
-                    Console.WriteLine("Du är nu inloggad.");
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("lösenordet stämmer inte, försök igen.");
-                }
+                return false;
             }
             else
             {
-                Console.WriteLine("Användarnamnet och lösenordet stämmer inte överens");
+ 
+                userName = UserName;
+                passWord = PassWord;
+
+                using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        var insertCmd = connection.CreateCommand();
+
+                        insertCmd.CommandText = "INSERT INTO User(UserName, PassWord, Create_Date) values('" + this.UserName + "', '" + this.PassWord + "', '" + this.CreateDate + "'); ";
+                        insertCmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                }
+                LoadAllUsers();
+
+              return true;
             }
-            return false;
+        }
+
+        public bool Login(string userName, string passWord)
+        {
+
+            if (UserList.Any(x => x.UserName == userName && x.PassWord == passWord))
+            {
+                return true;                
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

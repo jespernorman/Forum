@@ -25,7 +25,7 @@ namespace Forum
             DBPath = dbPath;
         }
 
-        public List<Post> GetPosts()
+        public List<Post> GetPosts(int chosenForumId)
         {
             var listOfPosts = new List<Post>();
 
@@ -39,9 +39,11 @@ namespace Forum
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                    SELECT *
-                    FROM Post
+                      SELECT *
+                      FROM Forum
+                      WHERE Forum_Id = $id
                 ";
+                command.Parameters.AddWithValue("$id", chosenForumId);
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -57,9 +59,9 @@ namespace Forum
 
                         post.PostId = int.Parse(postId);
                         post.ForumId = int.Parse(forumId);
-                        post.UserId = int.Parse(userId);
                         post.PostText = postText;
-                        post.CreateDate = DateTime.Parse(createDate); 
+                        post.CreateDate = DateTime.Parse(createDate);
+                        post.UserId = int.Parse(userId);
 
                         listOfPosts.Add(post);
                     }
@@ -68,9 +70,9 @@ namespace Forum
 
             return listOfPosts;
         }
-           
 
-        public void CreatePost()
+
+        public void CreatePost(string PostText)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -84,12 +86,13 @@ namespace Forum
                 {
                     var insertCmd = connection.CreateCommand();
 
-                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, User_Id, Post_Text, Create_Date) values('" + this.ForumId+ "', '" + this.UserId + "', '" + this.PostText + "', '" + this.CreateDate + "'); ";
+                    insertCmd.CommandText = "INSERT INTO Post(Post_Id, Forum_Id, Post_Text, Create_Date, User_Id,) values('" + this.PostId+ "', '" + this.ForumId+ "', '" + this.PostText + "', '" + this.CreateDate + "', '" + this.UserId + "'); ";
                     insertCmd.ExecuteNonQuery();
 
                     transaction.Commit();
                 }
             }
+            
         }
 
     }
