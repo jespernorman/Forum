@@ -83,5 +83,31 @@ namespace Forum
                 }
             }
         }
+        public void DeleteForum(int forumIdToDelete)        //ute o cyklar??
+        {
+            listOfForums = new List<Forum>();
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    DELETE *
+                    FROM Forum
+                    WHERE FORUM_ID = $id
+                ";
+                command.Parameters.AddWithValue("$id", forumIdToDelete);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    
+                }
+            }
+        }
     }
 }

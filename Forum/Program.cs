@@ -96,7 +96,7 @@ namespace Forum
                     Console.WriteLine("Forum Id: " + _forum.ForumId.ToString() + " forum namn: " + _forum.ForumName + " forumet är skapat: " + _forum.CreateDate);
                 }
 
-                Console.WriteLine("Välj 1 om du vill skriva i befintlig tråd, välj 2 om du vill skapa en ny");
+                Console.WriteLine("Välj 1 om du vill skriva i befintlig tråd, välj 2 om du vill skapa en ny, 3 om du vill radera en tråd.");
 
                 var val = Console.ReadLine();
 
@@ -116,10 +116,10 @@ namespace Forum
 
                             foreach (var _post in listOfPosts)
                             {
-                                Console.WriteLine("Forum Id: " + _post.ForumId.ToString() + " post text: " + _post.PostText + " posten är skapat: " + _post.CreateDate + " av userid:" + _post.UserId.ToString());
+                                Console.WriteLine("Forum Id: " + _post.ForumId.ToString() + " Post Id: " + _post.PostId.ToString() + " post text: " + _post.PostText + " posten är skapat: " + _post.CreateDate + " av userid:" + _post.UserId.ToString());
                             }
 
-                            Console.WriteLine("Tryck 1 om du vill lägga till en post i tråden, b för att backa till föregående menu och x för att avsluta");
+                            Console.WriteLine("Tryck 1 om du vill lägga till en post i tråden, 2 för att redigera en post, 3 för att ta bort en post, b för att backa till föregående menu eller x för att avsluta");
 
                             var addPostCommand = Console.ReadLine();
 
@@ -127,11 +127,13 @@ namespace Forum
                             {
                                 Environment.Exit(0);
                             }
+
                             if (addPostCommand == "b")
                             {
                                 forumIdInmatning = "b";
                                 continue;
                             }
+
                             if (addPostCommand == "1")
                             {
                                 Console.WriteLine("Mata in det du vill skriva i tråden");
@@ -142,6 +144,34 @@ namespace Forum
                                 Console.WriteLine("Din post är nu postad!");
                                 continue;
                             }
+
+                            if( addPostCommand == "2")          //Nytt
+                            {
+                                Console.WriteLine("Mata in det post id du vill redigera");
+                                string textchosenPostId = Console.ReadLine();
+                                int chosenPostId = int.Parse(textchosenPostId);
+
+                                Console.WriteLine("Skriv in det du vill skriva istället.");
+                                string newPostText = Console.ReadLine();
+                                post.UpdatePost(chosenPostId, user, newPostText);
+
+                                Console.WriteLine();
+                                Console.WriteLine();
+                                Console.WriteLine("Din post är nu updaterad!");
+                                continue;
+                            }
+
+                            if( addPostCommand == "3")              //nytt
+                            {
+                                Console.WriteLine("Mata in post id:t på den post du vill radera");
+                                string textchosenPostId = Console.ReadLine();
+                                int chosenPostId = int.Parse(textchosenPostId);
+                                post.DeletePost(chosenPostId);
+
+                                Console.WriteLine("Posten är nu raderad");
+                                continue;
+                            }
+
                             else
                             {
                                 Console.WriteLine("Det du matade in var inte giltigt");
@@ -150,6 +180,7 @@ namespace Forum
                         }
                     }
                 }
+
                 else if (int.Parse(val) == 2)
                 {
                     Console.WriteLine("Vad ska tråden heta?");
@@ -160,9 +191,22 @@ namespace Forum
 
                     continue;
                 }
+
+                else if (int.Parse(val) == 3)                   //nytt
+                {
+                    Console.WriteLine("Skriv in det forum id du vill radera.");
+                    string textChosenForumId = Console.ReadLine();
+                    int forumIdToDelete = int.Parse(textChosenForumId);
+                    forum.DeleteForum(forumIdToDelete);
+
+                    Console.WriteLine("Tråden är nu raderad");
+
+                    continue;
+                }
+
                 else
                 {
-                    Console.WriteLine("Det du matade in var inte giltigt. :)");
+                    Console.WriteLine("Det du matade in var inte giltigt.");
 
                 }
             }

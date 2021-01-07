@@ -12,6 +12,7 @@ namespace Forum
         public int UserId { get; set; }
         public string PostText { get; set; }
         public DateTime CreateDate { get; set; }
+        public int PostCount { get; set; }
 
         private string DBPath { get; set; }
 
@@ -72,7 +73,7 @@ namespace Forum
         }
 
 
-        public void CreatePost(Forum forum, User user , string postText)
+        public void CreatePost(Forum forum, User user, string postText)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -86,14 +87,112 @@ namespace Forum
                 {
                     var insertCmd = connection.CreateCommand();
 
-                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId+ "', '" + postText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
+                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId + "', '" + postText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
                     insertCmd.ExecuteNonQuery();
 
                     transaction.Commit();
                 }
             }
-            
+
+        }
+        public void UpdatePost(int chosenPostId, User user, string newPostText)     //Behövs forumid?
+        {
+            var listOfPosts = new List<Post>();
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                      SELECT *
+                      FROM  Post
+                      WHERE Post_Id = $id
+                ";
+                command.Parameters.AddWithValue("$id", chosenPostId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    var post = new Post();
+
+                    var postId = reader.GetString(0);
+                    var forumId = reader.GetString(1);
+                    var postText = reader.GetString(2);
+                    var createDate = reader.GetString(3);
+                    var userId = reader.GetString(4);
+
+                    post.PostId = int.Parse(postId);
+                    post.ForumId = int.Parse(forumId);
+                    post.PostText = newPostText;
+                    post.CreateDate = DateTime.Parse(createDate);
+                    post.UserId = int.Parse(userId);
+
+                    var transaction = connection.BeginTransaction();
+
+                    var insertCmd = connection.CreateCommand();
+
+                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + ForumId + "', '" + newPostText + "', '" + DateTime.Now + "', '" + UserId + "'); ";
+                    insertCmd.ExecuteNonQuery();
+
+                    transaction.Commit();
+                }
+            }
         }
 
+        public void DeletePost(int chosenPostId)        //Nytt  
+        {
+            var listOfPosts = new List<Post>();
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                      DELETE *
+                      FROM  Post
+                      WHERE Post_Id = $id
+                ";
+                command.Parameters.AddWithValue("$id", chosenPostId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    var post = new Post();
+
+                    var postId = reader.GetString(0);
+                    var forumId = reader.GetString(1);
+                    var postText = reader.GetString(2);
+                    var createDate = reader.GetString(3);
+                    var userId = reader.GetString(4);
+
+                    post.PostId = int.Parse(postId);
+                    post.ForumId = int.Parse(forumId);
+                    post.PostText = PostText;
+                    post.CreateDate = DateTime.Parse(createDate);
+                    post.UserId = int.Parse(userId);
+
+                }
+            }
+        }
+
+        public void PostCounter()               //??
+        {
+            var listOfPosts = new List<Post>();
+
+            for (int i = 0; i < listOfPosts.Count; i++)
+            {
+                i = PostCount;
+            }
+           
+     
+        }
     }
 }
