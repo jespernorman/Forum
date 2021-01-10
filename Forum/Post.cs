@@ -72,6 +72,55 @@ namespace Forum
             return listOfPosts;
         }
 
+        public List<Post> GetPostsByForumAndUser(int choosenForumId,int choosenUserId)
+        {
+            var listOfPosts = new List<Post>();
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                      SELECT P.Post_Id,P.Forum_Id,P.Post_Text,P.Create_Date,P.User_Id
+                      FROM  Post as P
+                      INNER JOIN Forum as F on P.Forum_Id = F.Forum_Id
+                      INNER JOIN User as U on U.User_Id = P.User_Id
+                      WHERE F.Forum_Id = $id and U.User_Id = $userId
+                ";
+                command.Parameters.AddWithValue("$id", choosenForumId);
+                command.Parameters.AddWithValue("$userId", choosenUserId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var post = new Post();
+
+                        var postId = reader.GetString(0);
+                        var forumId = reader.GetString(1);
+                        var postText = reader.GetString(2);
+                        var createDate = reader.GetString(3);
+                        var userId = reader.GetString(4);
+
+                        post.PostId = int.Parse(postId);
+                        post.ForumId = int.Parse(forumId);
+                        post.PostText = postText;
+                        post.CreateDate = DateTime.Parse(createDate);
+                        post.UserId = int.Parse(userId);
+
+                        listOfPosts.Add(post);
+                    }
+                }
+            }
+
+            return listOfPosts;
+        }
+
 
         public void CreatePost(Forum forum, User user, string postText)
         {
@@ -89,16 +138,13 @@ namespace Forum
 
                     insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId + "', '" + postText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
                     insertCmd.ExecuteNonQuery();
-
                     transaction.Commit();
                 }
             }
 
         }
-        public void UpdatePost(int chosenPostId, User user, string newPostText)     //Behövs forumid?
+        public void UpdatePost(int chosenPostId, User user, string newPostText)
         {
-            var listOfPosts = new List<Post>();
-
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
@@ -109,44 +155,18 @@ namespace Forum
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                      SELECT *
-                      FROM  Post
+                      UPDATE Post SET Post_Text = $newPostText
                       WHERE Post_Id = $id
                 ";
                 command.Parameters.AddWithValue("$id", chosenPostId);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    var post = new Post();
-
-                    var postId = reader.GetString(0);
-                    var forumId = reader.GetString(1);
-                    var postText = reader.GetString(2);
-                    var createDate = reader.GetString(3);
-                    var userId = reader.GetString(4);
-
-                    post.PostId = int.Parse(postId);
-                    post.ForumId = int.Parse(forumId);
-                    post.PostText = newPostText;
-                    post.CreateDate = DateTime.Parse(createDate);
-                    post.UserId = int.Parse(userId);
-
-                    var transaction = connection.BeginTransaction();
-
-                    var insertCmd = connection.CreateCommand();
-
-                    insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + ForumId + "', '" + newPostText + "', '" + DateTime.Now + "', '" + UserId + "'); ";
-                    insertCmd.ExecuteNonQuery();
-
-                    transaction.Commit();
-                }
+                command.Parameters.AddWithValue("$newPostText", newPostText);
+                command.ExecuteNonQuery();
+                connection.Close();
             }
         }
 
-        public void DeletePost(int chosenPostId)        //Nytt  
+        public void DeletePost(int chosenPostId)
         {
-            var listOfPosts = new List<Post>();
-
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
@@ -157,29 +177,12 @@ namespace Forum
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                      DELETE *
-                      FROM  Post
+                      DELETE FROM Post
                       WHERE Post_Id = $id
                 ";
                 command.Parameters.AddWithValue("$id", chosenPostId);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    var post = new Post();
-
-                    var postId = reader.GetString(0);
-                    var forumId = reader.GetString(1);
-                    var postText = reader.GetString(2);
-                    var createDate = reader.GetString(3);
-                    var userId = reader.GetString(4);
-
-                    post.PostId = int.Parse(postId);
-                    post.ForumId = int.Parse(forumId);
-                    post.PostText = PostText;
-                    post.CreateDate = DateTime.Parse(createDate);
-                    post.UserId = int.Parse(userId);
-
-                }
+                command.ExecuteNonQuery();
+                connection.Close();
             }
         }
 
@@ -191,8 +194,6 @@ namespace Forum
             {
                 i = PostCount;
             }
-           
-     
         }
     }
 }

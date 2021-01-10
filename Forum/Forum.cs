@@ -97,16 +97,12 @@ namespace Forum
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                    DELETE *
-                    FROM Forum
+                    DELETE FROM Forum
                     WHERE FORUM_ID = $id
                 ";
                 command.Parameters.AddWithValue("$id", forumIdToDelete);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    
-                }
+                command.ExecuteNonQuery();
+                connection.Close();
             }
         }
     }
