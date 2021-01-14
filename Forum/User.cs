@@ -10,7 +10,7 @@ namespace Forum
     {
         public int UserId { get; set; }
         public string UserName { get; set; }
-        private string PassWord { get; set; }
+        public string PassWord { get; set; }
         public DateTime CreateDate { get; set; }
 
         public List<User> UserList = new List<User>();
@@ -30,47 +30,56 @@ namespace Forum
 
         public void LoadAllUsers()
         {
+            var userRepository = new UserRepository();
 
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
+            userRepository.GetAllUsers();
 
-            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            {
-                connection.Open();
+            var user = new User();
 
-                var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    SELECT *
-                    FROM User
-                ";
+            UserList.Add(user);
 
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var user = new User();
+            //var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            //connectionStringBuilder.DataSource = DBPath;
 
-                        var userId = reader.GetString(0);
-                        var userName = reader.GetString(1);
-                        var password = reader.GetString(2);
-                        var createDate = reader.GetString(3);
-                        
+            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            //{
+            //    connection.Open();
 
-                        user.UserId = int.Parse(userId);
-                        user.UserName = userName;
-                        user.PassWord = password;
-                        user.CreateDate = DateTime.Parse(createDate);
+            //    var command = connection.CreateCommand();
+            //    command.CommandText =
+            //    @"
+            //        SELECT *
+            //        FROM User
+            //    ";
 
-                        UserList.Add(user);
-                    }
-                }
-            }
+            //    using (var reader = command.ExecuteReader())
+            //    {
+            //        while (reader.Read())
+            //        {
+            //            var user = new User();
+
+            //            var userId = reader.GetString(0);
+            //            var userName = reader.GetString(1);
+            //            var password = reader.GetString(2);
+            //            var createDate = reader.GetString(3);
+
+
+            //            user.UserId = int.Parse(userId);
+            //            user.UserName = userName;
+            //            user.PassWord = password;
+            //            user.CreateDate = DateTime.Parse(createDate);
+
+            //            UserList.Add(user);
+            //        }
+            //    }
+            //}
         }
 
         public bool CreateUser(string userName, string passWord)
         {
             var user = new User();
+            var userRepository = new UserRepository();
+
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
@@ -80,20 +89,22 @@ namespace Forum
             }
             else
             {
-                using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-                {
-                    connection.Open();
+                userRepository.AddUserToRepository();
 
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        var insertCmd = connection.CreateCommand();
+                //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+                //{
+                //    connection.Open();
 
-                        insertCmd.CommandText = "INSERT INTO User(userName, passWord, Create_Date) values('" + userName + "', '" + passWord + "', '" + DateTime.Now + "'); ";
-                        insertCmd.ExecuteNonQuery();
+                //    using (var transaction = connection.BeginTransaction())
+                //    {
+                //        var insertCmd = connection.CreateCommand();
 
-                        transaction.Commit();
-                    }
-                }
+                //        insertCmd.CommandText = "INSERT INTO User(userName, passWord, Create_Date) values('" + userName + "', '" + passWord + "', '" + DateTime.Now + "'); ";
+                //        insertCmd.ExecuteNonQuery();
+
+                //        transaction.Commit();
+                //    }
+                //}
                 LoadAllUsers();
 
               return true;

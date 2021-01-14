@@ -14,9 +14,9 @@ namespace Forum
         public List <Forum> listOfForums = new List<Forum>();
         private string DBPath { get; set; }
 
-        public Forum(string dbPath)
+        //public Forum(string dbPath)
         {
-            DBPath = dbPath;
+           // DBPath = dbPath;
         }
 
         public List<Forum> GetForums()
@@ -27,36 +27,36 @@ namespace Forum
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
             
-            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            {
-                connection.Open();
+            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            //{
+            //    connection.Open();
 
-                var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    SELECT *
-                    FROM Forum
-                ";
+            //    var command = connection.CreateCommand();
+            //    command.CommandText =
+            //    @"
+            //        SELECT *
+            //        FROM Forum
+            //    ";
 
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var forum = new Forum(DBPath);
-                        var id = reader.GetString(0);
-                        var name = reader.GetString(1);
-                        var userid = reader.GetString(2);
-                        var createDate = reader.GetString(3);
+            //    using (var reader = command.ExecuteReader())
+            //    {
+            //        while (reader.Read())
+            //        {
+            //            var forum = new Forum(DBPath);
+            //            var id = reader.GetString(0);
+            //            var name = reader.GetString(1);
+            //            var userid = reader.GetString(2);
+            //            var createDate = reader.GetString(3);
                         
-                        forum.ForumId = int.Parse(id);
-                        forum.ForumName = name;
-                        forum.UserId = int.Parse(userid);
-                        forum.CreateDate = DateTime.Parse(createDate);
+            //            forum.ForumId = int.Parse(id);
+            //            forum.ForumName = name;
+            //            forum.UserId = int.Parse(userid);
+            //            forum.CreateDate = DateTime.Parse(createDate);
 
-                        listOfForums.Add(forum);
-                    }
-                }
-            }
+            //            listOfForums.Add(forum);
+            //        }
+            //    }
+            //}
 
             return listOfForums;
 
