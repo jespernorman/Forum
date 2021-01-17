@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapper;
-using Microsoft.Data.Sqlite;
 
 namespace Forum
 {
@@ -16,6 +14,8 @@ namespace Forum
         public List<User> UserList = new List<User>();
 
         private string DBPath { get; set; }
+        private UserRepository UserRepository { get; set; }
+
 
         public User()
         {
@@ -25,89 +25,27 @@ namespace Forum
         public User(string dbPath)
         {
             DBPath = dbPath;
+            UserRepository = new UserRepository(dbPath);
             LoadAllUsers();
         }
 
         public void LoadAllUsers()
         {
             var userRepository = new UserRepository();
-
-            userRepository.GetAllUsers();
-
-            var user = new User();
-
-            UserList.Add(user);
-
-            //var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            //connectionStringBuilder.DataSource = DBPath;
-
-            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            //{
-            //    connection.Open();
-
-            //    var command = connection.CreateCommand();
-            //    command.CommandText =
-            //    @"
-            //        SELECT *
-            //        FROM User
-            //    ";
-
-            //    using (var reader = command.ExecuteReader())
-            //    {
-            //        while (reader.Read())
-            //        {
-            //            var user = new User();
-
-            //            var userId = reader.GetString(0);
-            //            var userName = reader.GetString(1);
-            //            var password = reader.GetString(2);
-            //            var createDate = reader.GetString(3);
-
-
-            //            user.UserId = int.Parse(userId);
-            //            user.UserName = userName;
-            //            user.PassWord = password;
-            //            user.CreateDate = DateTime.Parse(createDate);
-
-            //            UserList.Add(user);
-            //        }
-            //    }
-            //}
+            UserList = userRepository.GetAll();
         }
 
         public bool CreateUser(string userName, string passWord)
         {
-            var user = new User();
-            var userRepository = new UserRepository();
-
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
-
             if (UserList.Any(x => x.UserName == UserName))
             {
                 return false;
             }
             else
             {
-                userRepository.AddUserToRepository();
-
-                //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-                //{
-                //    connection.Open();
-
-                //    using (var transaction = connection.BeginTransaction())
-                //    {
-                //        var insertCmd = connection.CreateCommand();
-
-                //        insertCmd.CommandText = "INSERT INTO User(userName, passWord, Create_Date) values('" + userName + "', '" + passWord + "', '" + DateTime.Now + "'); ";
-                //        insertCmd.ExecuteNonQuery();
-
-                //        transaction.Commit();
-                //    }
-                //}
+                UserRepository.AddUser(userName, passWord);
                 LoadAllUsers();
-
-              return true;
+                return true;
             }
         }
 
@@ -118,9 +56,9 @@ namespace Forum
             {
                 var loggedInUser = UserList.FirstOrDefault(x => x.UserName == userName && x.PassWord == passWord);
                 // Set the properties with the logged in user
-                this.UserId = loggedInUser.UserId;
-                this.CreateDate = loggedInUser.CreateDate;
-                this.UserName = loggedInUser.UserName;
+                UserId = loggedInUser.UserId;
+                CreateDate = loggedInUser.CreateDate;
+                UserName = loggedInUser.UserName;
                 return true;                
             }
             else

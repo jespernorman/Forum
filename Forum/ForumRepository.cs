@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
@@ -10,88 +10,115 @@ namespace Forum
     {
         public List<Forum> ListOfForums = new List<Forum>();
 
+        private string DBPath { get; set; }
+
         public ForumRepository()
         {
 
         }
 
-        var connectionStringBuilder = new SqliteConnectionStringBuilder();
-        DbConnectionStringBuilder.DataSource = DBPath;
+        public ForumRepository(string dbPath)
+        {
+            DBPath = dbPath;
+        }
 
-        public void LoadAllForumFromRepository()
+        public List<Forum> GetAll()
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
+            var ForumList = new List<Forum>();
+
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-
-                var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    SELECT *
-                    FROM Forum
-                ";
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var forum = new Forum(DBPath);
-                        var id = reader.GetString(0);
-                        var name = reader.GetString(1);
-                        var userid = reader.GetString(2);
-                        var createDate = reader.GetString(3);
-
-                        forum.ForumId = int.Parse(id);
-                        forum.ForumName = name;
-                        forum.UserId = int.Parse(userid);
-                        forum.CreateDate = DateTime.Parse(createDate);
-
-                        ListOfForums.Add(forum);
-                    }
-                }
+                ListOfForums = connection.Query<Forum>("SELECT * FROM Forum").AsList();
             }
+
+            return ListOfForums;
         }
-        public void CreateForumToRepository()
+
+        public Forum GetById(int forumId)
         {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
             var forum = new Forum();
-            var user = new User();
 
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-
-                //Insert data:
-                using (var transaction = connection.BeginTransaction())
-                {
-                    var insertCmd = connection.CreateCommand();
-
-                    insertCmd.CommandText = "INSERT INTO Forum(Forum_Name, User_Id, Create_Date) values('" + forum.ForumName + "', '" + user.UserId + "', '" + DateTime.Now + "'); ";
-                    insertCmd.ExecuteNonQuery();
-
-                    transaction.Commit();
-                }
+                forum = connection.QueryFirst<Forum>("SELECT * FROM Forum WHERE id=@id", new { id = forumId });
             }
+
+            return forum;
         }
 
-        public void DeleteForumFromRepository(int forumIdToDelete)
+        public bool AddForum(string forumName, User user)
         {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            int insertedRow = 0;
+
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
 
-                var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    DELETE FROM Forum
-                    WHERE FORUM_ID = $id
-                ";
-                command.Parameters.AddWithValue("$id", forumIdToDelete);
-                command.ExecuteNonQuery();
-                connection.Close();
+                var query = "INSERT INTO Forum(Forum_Name, User_Id, Create_Date) VALUES(@Forum_Name, @User_Id, @Create_Date)";
+
+                var dp = new DynamicParameters();
+                dp.Add("@Forum_Name", forumName, DbType.AnsiString, ParameterDirection.Input, 255);
+                dp.Add("@User_Id", user.UserId);
+                dp.Add("@Create_Date", DateTime.Now);
+
+                insertedRow = connection.Execute(query, dp);
             }
+
+            if (insertedRow > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool DeleteForum(int forumId)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            int delRows = 0;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                delRows = connection.Execute(@"DELETE FROM Forum WHERE Id = @Id", new { Id = forumId });
+            }
+
+            if (delRows > 0)
+                return true;
+
+            return false;
+        }
+
+        public bool UpdateForum(int forumId, string forumName, int userId)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
+
+            int updatedRows = 0;
+
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                updatedRows = connection.Execute("UPDATE Forum SET forum_Name = @forumName,User_Id = @userId WHERE Forum_Id = @forumId", new { forumName, userId, forumId });
+            }
+
+            if (updatedRows > 0)
+                return true;
+
+            return false;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Forum
         public int PostCount { get; set; }
 
         private string DBPath { get; set; }
+        private PostRepository PostRepository { get; set; }
 
         public Post()
         {
@@ -24,52 +25,12 @@ namespace Forum
         public Post(string dbPath)
         {
             DBPath = dbPath;
+            PostRepository = new PostRepository(dbPath);
         }
 
         public List<Post> GetPosts(int chosenForumId)
         {
-            var listOfPosts = new List<Post>();
-
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
-
-            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            //{
-            //    connection.Open();
-
-            //    var command = connection.CreateCommand();
-            //    command.CommandText =
-            //    @"
-            //          SELECT *
-            //          FROM  Post
-            //          WHERE Forum_Id = $id
-            //    ";
-            //    command.Parameters.AddWithValue("$id", chosenForumId);
-
-            //    using (var reader = command.ExecuteReader())
-            //    {
-            //        while (reader.Read())
-            //        {
-            //            var post = new Post();
-
-            //            var postId = reader.GetString(0);
-            //            var forumId = reader.GetString(1);
-            //            var postText = reader.GetString(2);
-            //            var createDate = reader.GetString(3);
-            //            var userId = reader.GetString(4);
-
-            //            post.PostId = int.Parse(postId);
-            //            post.ForumId = int.Parse(forumId);
-            //            post.PostText = postText;
-            //            post.CreateDate = DateTime.Parse(createDate);
-            //            post.UserId = int.Parse(userId);
-
-            //            listOfPosts.Add(post);
-            //        }
-            //    }
-            //}
-
-            return listOfPosts;
+            return PostRepository.GetPostsByForumId(chosenForumId);
         }
 
         public List<Post> GetPostsByForumAndUser(int choosenForumId,int choosenUserId)

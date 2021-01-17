@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.Data.Sqlite;
-using Dapper;
 using System.Linq;
 
 namespace Forum
@@ -106,11 +104,11 @@ namespace Forum
                     forumIdInmatning = Console.ReadLine();
                     chosenForumId = int.Parse(forumIdInmatning);
 
-                    if (forum.listOfForums.Any(x => x.ForumId == chosenForumId))
+                    if (forums.Any(x => x.ForumId == chosenForumId))
                     {
                         while (forumIdInmatning != "b")
                         {
-                            var choosenForum = forum.listOfForums.FirstOrDefault(x => x.ForumId == chosenForumId);
+                            var choosenForum = forums.FirstOrDefault(x => x.ForumId == chosenForumId);
 
                             var listOfPosts = post.GetPosts(chosenForumId);
 
