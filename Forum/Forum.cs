@@ -36,7 +36,7 @@ namespace Forum
             return ForumRepository.AddForum(forumName, user);
         }
 
-        public bool DeleteForum(int forumIdToDelete)        //ute o cyklar??
+        public bool DeleteForum(int forumIdToDelete)        
         {
             return ForumRepository.DeleteForum(forumIdToDelete);
         }

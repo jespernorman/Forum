@@ -30,7 +30,7 @@ namespace Forum
 
         public List<Post> GetPosts(int chosenForumId)
         {
-            return PostRepository.GetPostsByForumId(chosenForumId);
+            return PostRepository.LoadAllPosts(chosenForumId);
         }
 
         public List<Post> GetPostsByForumAndUser(int choosenForumId,int choosenUserId)
@@ -83,31 +83,15 @@ namespace Forum
         }
 
 
-        public void CreatePost(Forum forum, User user, string postText)
+        public bool CreatePost(int forumId, User user, string postText)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
-
-            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            //{
-            //    connection.Open();
-
-            //    //Insert data:
-            //    using (var transaction = connection.BeginTransaction())
-            //    {
-            //        var insertCmd = connection.CreateCommand();
-
-            //        insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId + "', '" + postText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
-            //        insertCmd.ExecuteNonQuery();
-            //        transaction.Commit();
-            //    }
-            //}
-
+            return PostRepository.AddPost(forumId, user.UserId, postText); // vilka inparametrar ska jag ha? samma som in i denna metoden eller det jag hittat på i repot??
         }
-        public void UpdatePost(int chosenPostId, User user, string newPostText)
+
+        public bool UpdatePost(int chosenPostId, string newPostText)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
+            return PostRepository.EditPost(chosenPostId, newPostText); //vilka e rätt?
+
 
             //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             //{
@@ -126,25 +110,9 @@ namespace Forum
             //}
         }
 
-        public void DeletePost(int chosenPostId)
+        public bool DeletePost(int chosenPostId)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
-
-            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            //{
-            //    connection.Open();
-
-            //    var command = connection.CreateCommand();
-            //    command.CommandText =
-            //    @"
-            //          DELETE FROM Post
-            //          WHERE Post_Id = $id
-            //    ";
-            //    command.Parameters.AddWithValue("$id", chosenPostId);
-            //    command.ExecuteNonQuery();
-            //    connection.Close();
-            //}
+        return PostRepository.DeleteChosenPost(chosenPostId);
         }
     }
 }

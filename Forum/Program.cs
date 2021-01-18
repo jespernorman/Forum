@@ -136,7 +136,7 @@ namespace Forum
                             {
                                 Console.WriteLine("Mata in det du vill skriva i tråden");
                                 string PostText = Console.ReadLine();
-                                post.CreatePost(choosenForum, user, PostText);
+                                post.CreatePost(choosenForum.ForumId, user, PostText);
                                 Console.WriteLine();
                                 Console.WriteLine();
                                 Console.WriteLine("Din post är nu postad!");
@@ -151,7 +151,7 @@ namespace Forum
 
                                 Console.WriteLine("Skriv in det du vill skriva istället.");
                                 string newPostText = Console.ReadLine();
-                                post.UpdatePost(chosenPostId, user, newPostText);
+                                post.UpdatePost(chosenPostId, newPostText);
 
                                 Console.WriteLine();
                                 Console.WriteLine();

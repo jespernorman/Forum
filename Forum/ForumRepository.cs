@@ -27,7 +27,7 @@ namespace Forum
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
-            var ForumList = new List<Forum>();
+            var ForumList = new List<Forum>(); //?? inte listofforum?
 
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
