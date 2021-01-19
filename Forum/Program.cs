@@ -15,7 +15,7 @@ namespace Forum
             var forum = new Forum(dbPath);
             var post = new Post(dbPath);    
             var user = new User(dbPath);
-            user.LoadAllUsers();
+            //user.LoadAllUsers();
 
             string userName;
             string passWord;

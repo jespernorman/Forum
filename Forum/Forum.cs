@@ -12,7 +12,6 @@ namespace Forum
         public int UserId { get; set; }
 
         //public List<Forum> listOfForums = new List<Forum>();
-        private string DBPath { get; set; }
         private ForumRepository ForumRepository { get; set; }
 
         public Forum()
@@ -22,7 +21,6 @@ namespace Forum
 
         public Forum(string dbPath)
         {
-            DBPath = dbPath;
             ForumRepository = new ForumRepository(dbPath);
         }
 

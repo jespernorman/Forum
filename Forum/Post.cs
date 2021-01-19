@@ -14,7 +14,6 @@ namespace Forum
         public DateTime CreateDate { get; set; }
         public int PostCount { get; set; }
 
-        private string DBPath { get; set; }
         private PostRepository PostRepository { get; set; }
 
         public Post()
@@ -24,7 +23,6 @@ namespace Forum
 
         public Post(string dbPath)
         {
-            DBPath = dbPath;
             PostRepository = new PostRepository(dbPath);
         }
 
@@ -37,8 +35,8 @@ namespace Forum
         {
             var listOfPosts = new List<Post>();
 
-            var connectionStringBuilder = new SqliteConnectionStringBuilder();
-            connectionStringBuilder.DataSource = DBPath;
+            //var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            //connectionStringBuilder.DataSource = DBPath;
 
             //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             //{

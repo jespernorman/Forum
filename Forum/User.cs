@@ -13,7 +13,6 @@ namespace Forum
 
         public List<User> UserList = new List<User>();
 
-        private string DBPath { get; set; }
         private UserRepository UserRepository { get; set; }
 
 
@@ -24,15 +23,13 @@ namespace Forum
 
         public User(string dbPath)
         {
-            DBPath = dbPath;
             UserRepository = new UserRepository(dbPath);
             LoadAllUsers();
         }
 
         public void LoadAllUsers()
         {
-            var userRepository = new UserRepository();
-            UserList = userRepository.GetAll();
+            UserList = UserRepository.GetAll();
         }
 
         public bool CreateUser(string userName, string passWord)
