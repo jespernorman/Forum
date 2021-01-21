@@ -8,7 +8,6 @@ namespace Forum
 {
     public class PostRepository
     {
-        public List<Post> ListOfPosts = new List<Post>();
 
         private string DBPath { get; set; }
 
@@ -17,102 +16,78 @@ namespace Forum
             DBPath = dbPath;
         }
 
-
-        public List<Post> LoadAllPosts(int chosenForumId)
+        public List<Post> GetAllPosts()
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
-            var postsLists = new List<Post>();
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                ListOfPosts = connection.Query<Post>("SELECT * FROM Post").AsList();
+                var result = connection.Query<Post>("SELECT * FROM Post").AsList();
+                return result;
             }
-            return ListOfPosts;
         }
 
-            //using ( var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        public List<Post> GetPostsByForumId(int choosenForumId)
+        {
 
-            //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            //{
-            //    connection.Open();
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
-            //    var command = connection.CreateCommand();
-            //    command.CommandText =
-            //    @"
-            //          SELECT *
-            //          FROM  Post
-            //          WHERE Forum_Id = $id
-            //    ";
-            //    command.Parameters.AddWithValue("$id", chosenForumId);
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@forumId", new { forumId = choosenForumId }).AsList();
+                return result;
+            }
+        }
 
-            //    using (var reader = command.ExecuteReader())
-            //    {
-            //        while (reader.Read())
-            //        {
-            //            var post = new Post();
+        public List<Post> GetPostsByForumAndUser(int choosenForumId, int choosenUserId)
+        {
 
-            //            var postId = reader.GetString(0);
-            //            var forumId = reader.GetString(1);
-            //            var postText = reader.GetString(2);
-            //            var createDate = reader.GetString(3);
-            //            var userId = reader.GetString(4);
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
-            //            post.PostId = int.Parse(postId);
-            //            post.ForumId = int.Parse(forumId);
-            //            post.PostText = postText;
-            //            post.CreateDate = DateTime.Parse(createDate);
-            //            post.UserId = int.Parse(userId);
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@forumId AND UserId = @userId", new { forumId = choosenForumId, userId = choosenUserId }).AsList();
+                return result;
+            }
+        }
 
-            //            ListOfPosts.Add(post);
-            //        }
-            //    }
-            
-    
-        //public List<Post> LoadPostsByForumAndUserToRepository(int choosenForumId, int choosenUserId)
-        //{
-        //    using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-        //    {
-        //        connection.Open();
+        public List<Post> GetPostsByForumNameAndUserName(string forumName, string userName)
+        {
 
-        //        var command = connection.CreateCommand();
-        //        command.CommandText =
-        //        @"
-        //              SELECT P.Post_Id,P.Forum_Id,P.Post_Text,P.Create_Date,P.User_Id
-        //              FROM  Post as P
-        //              INNER JOIN Forum as F on P.Forum_Id = F.Forum_Id
-        //              INNER JOIN User as U on U.User_Id = P.User_Id
-        //              WHERE F.Forum_Id = $id and U.User_Id = $userId
-        //        ";
-        //        command.Parameters.AddWithValue("$id", choosenForumId);
-        //        command.Parameters.AddWithValue("$userId", choosenUserId);
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
-        //        using (var reader = command.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                var post = new Post();
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                var result = connection.Query<Post>("SELECT P.PostId,P.ForumId,P.PostText,P.CreateDate,P.UserId FROM Post as P " +
+                    "INNER JOIN Forum as F on P.ForumId = F.ForumId " +
+                    "INNER JOIN User as U on P.UserId = P.UserId" +
+                    "WHERE F.ForumName = @ForumName AND U.UserName = @UserName", new { ForumName = forumName, UserName = userName }).AsList();
+                return result;
+            }
+        }
 
-        //                var postId = reader.GetString(0);
-        //                var forumId = reader.GetString(1);
-        //                var postText = reader.GetString(2);
-        //                var createDate = reader.GetString(3);
-        //                var userId = reader.GetString(4);
+        public Post GetPostById(int postId)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = DBPath;
 
-        //                post.PostId = int.Parse(postId);
-        //                post.ForumId = int.Parse(forumId);
-        //                post.PostText = postText;
-        //                post.CreateDate = DateTime.Parse(createDate);
-        //                post.UserId = int.Parse(userId);
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+                var result = connection.QueryFirst<Post>("SELECT * FROM Post WHERE PostId=@id", new { id = postId });
+                return result;
+            }
+        }
 
-        //                ListOfPosts.Add(post);
-        //            }
-        //        }
-
-        //    }
-        //}
-        public bool AddPost(int forumId, int userId, string postText) //USER user?
+        public bool CreatePost(int forumId, int userId, string postText) //USER user?
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -123,13 +98,13 @@ namespace Forum
             {
                 connection.Open();
 
-                var query = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) VALUES(@Forum_Id, @Post_Text, @Create_Date";
+                var query = "INSERT INTO Post(ForumId, PostText, CreateDate, UserId) VALUES(@ForumId, @PostText, @CreateDate";
 
                 var dp = new DynamicParameters();
-                dp.Add("@Forum_Id", forumId);
-                dp.Add("@Post_Text", postText, DbType.AnsiString, ParameterDirection.Input, 255);
-                dp.Add("@Create_Date", DateTime.Now);
-                dp.Add("@User_Id", userId);
+                dp.Add("@ForumId", forumId);
+                dp.Add("@PostText", postText, DbType.AnsiString, ParameterDirection.Input, 255);
+                dp.Add("@CreateDate", DateTime.Now);
+                dp.Add("@UserId", userId);
 
                 insertedRow = connection.Execute(query, dp);
             }
@@ -141,26 +116,8 @@ namespace Forum
 
             return false;
         }
-    //var forum = new Forum();
-    //var post = new Post();
-    //var user = new User();
 
-    //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-    //{
-    //    connection.Open();
-
-    //    //Insert data:
-    //    using (var transaction = connection.BeginTransaction())
-    //    {
-    //        var insertCmd = connection.CreateCommand();
-
-    //        insertCmd.CommandText = "INSERT INTO Post(Forum_Id, Post_Text, Create_Date, User_Id) values('" + forum.ForumId + "', '" + post.PostText + "', '" + DateTime.Now + "', '" + user.UserId + "'); ";
-    //        insertCmd.ExecuteNonQuery();
-    //        transaction.Commit();
-    //    }
-    //}
-
-        public bool EditPost(int chosenPostId, string newPostText)
+        public bool UpdatePost(int choosenPostId, string newPostText)
         {
 
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
@@ -171,7 +128,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
               connection.Open();
-              updatedRows = connection.Execute("UPDATE Post SET Post_Text = @Post_Text WHERE Post_Id = @postId", new { newPostText, chosenPostId });
+              updatedRows = connection.Execute("UPDATE Post SET PostText = @PostText WHERE PostId = @postId", new { newPostText, choosenPostId });
             }
 
             if (updatedRows > 0)
@@ -181,24 +138,8 @@ namespace Forum
 
             return false;
         }
-        //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-        //{
-        //    connection.Open();
-
-        //    var command = connection.CreateCommand();
-        //    command.CommandText =
-        //    @"
-        //          UPDATE Post SET Post_Text = $newPostText
-        //          WHERE Post_Id = $id
-        //    ";
-        //    command.Parameters.AddWithValue("$id", chosenPostId);
-        //    command.Parameters.AddWithValue("$newPostText", newPostText);
-        //    command.ExecuteNonQuery();
-        //    connection.Close();
-        //}
     
-
-        public bool DeleteChosenPost(int chosenPostId)
+        public bool DeletePost(int chosenPostId)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -211,27 +152,11 @@ namespace Forum
             }
 
             if (delRows > 0)
-            {//?
+            {
                return true;
             }
             
-        return false;
+            return false;
         }
-
-    //using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-    //{
-    //    connection.Open();
-
-    //    var command = connection.CreateCommand();
-    //    command.CommandText =
-    //    @"
-    //          DELETE FROM Post
-    //          WHERE Post_Id = $id
-    //    ";
-    //    command.Parameters.AddWithValue("$id", chosenPostId);
-    //    command.ExecuteNonQuery();
-    //    connection.Close();
-
-        
     }
 }

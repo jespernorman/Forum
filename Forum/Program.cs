@@ -81,7 +81,7 @@ namespace Forum
         public static void HandleForum(User user, Forum forum, Post post)
         {
             string forumIdInmatning = "";
-            int chosenForumId = 0;
+            int choosenForumId = 0;
 
             while (forumIdInmatning != "x")
             {
@@ -102,15 +102,15 @@ namespace Forum
                 {
                     Console.WriteLine("Välj vilken tråd du vill öppna med att mata in forum Id:t");
                     forumIdInmatning = Console.ReadLine();
-                    chosenForumId = int.Parse(forumIdInmatning);
+                    choosenForumId = int.Parse(forumIdInmatning);
 
-                    if (forums.Any(x => x.ForumId == chosenForumId))
+                    if (forums.Any(x => x.ForumId == choosenForumId))
                     {
                         while (forumIdInmatning != "b")
                         {
-                            var choosenForum = forums.FirstOrDefault(x => x.ForumId == chosenForumId);
+                            var choosenForum = forums.FirstOrDefault(x => x.ForumId == choosenForumId);
 
-                            var listOfPosts = post.GetPosts(chosenForumId);
+                            var listOfPosts = post.GetPostsByForumId(choosenForumId);
 
                             foreach (var _post in listOfPosts)
                             {
@@ -136,7 +136,7 @@ namespace Forum
                             {
                                 Console.WriteLine("Mata in det du vill skriva i tråden");
                                 string PostText = Console.ReadLine();
-                                post.CreatePost(choosenForum.ForumId, user, PostText);
+                                post.CreatePost(choosenForum.ForumId, user.UserId, PostText);
                                 Console.WriteLine();
                                 Console.WriteLine();
                                 Console.WriteLine("Din post är nu postad!");

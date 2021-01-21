@@ -8,7 +8,6 @@ namespace Forum
 {
     public class ForumRepository
     {
-        public List<Forum> ListOfForums = new List<Forum>();
 
         private string DBPath { get; set; }
 
@@ -22,23 +21,18 @@ namespace Forum
             DBPath = dbPath;
         }
 
-        public List<Forum> GetAll()
+        public List<Forum> GetAllForums()
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
 
-            var ForumList = new List<Forum>(); //?? inte listofforum?
-
-            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            {
-                connection.Open();
-                ListOfForums = connection.Query<Forum>("SELECT * FROM Forum").AsList();
-            }
-
-            return ListOfForums;
+            using var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
+            connection.Open();
+            var result = connection.Query<Forum>("SELECT * FROM Forum").AsList();
+            return result;
         }
 
-        public Forum GetById(int forumId)
+        public Forum GetForumById(int forumId)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -54,7 +48,7 @@ namespace Forum
             return forum;
         }
 
-        public bool AddForum(string forumName, User user)
+        public bool CreateForum(string forumName, User user)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -65,12 +59,12 @@ namespace Forum
             {
                 connection.Open();
 
-                var query = "INSERT INTO Forum(Forum_Name, User_Id, Create_Date) VALUES(@Forum_Name, @User_Id, @Create_Date)";
+                var query = "INSERT INTO Forum(ForumName, UserId, CreateDate) VALUES(@ForumName, @UserId, @CreateDate)";
 
                 var dp = new DynamicParameters();
-                dp.Add("@Forum_Name", forumName, DbType.AnsiString, ParameterDirection.Input, 255);
-                dp.Add("@User_Id", user.UserId);
-                dp.Add("@Create_Date", DateTime.Now);
+                dp.Add("@ForumName", forumName, DbType.AnsiString, ParameterDirection.Input, 255);
+                dp.Add("@UserId", user.UserId);
+                dp.Add("@CreateDate", DateTime.Now);
 
                 insertedRow = connection.Execute(query, dp);
             }
@@ -112,7 +106,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                updatedRows = connection.Execute("UPDATE Forum SET forum_Name = @forumName,User_Id = @userId WHERE Forum_Id = @forumId", new { forumName, userId, forumId });
+                updatedRows = connection.Execute("UPDATE Forum SET ForumName = @forumName,UserId = @userId WHERE ForumId = @forumId", new { forumName, userId, forumId });
             }
 
             if (updatedRows > 0)

@@ -20,7 +20,7 @@ namespace Forum
             DBPath = dbPath;
         }
 
-        public List<User> GetAll()
+        public List<User> GetAllUsers()
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -36,7 +36,7 @@ namespace Forum
             return UserList;
         }
 
-        public User GetById(int userId)
+        public User GetUserById(int userId)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -52,7 +52,7 @@ namespace Forum
             return user;
         }
 
-        public User GetByUserName(int userName)
+        public User GetUserByName(int userName)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -68,7 +68,7 @@ namespace Forum
             return user;
         }
 
-        public bool AddUser(string userName, string passWord)
+        public bool CreateUser(string userName, string passWord)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
