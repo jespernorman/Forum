@@ -38,7 +38,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@forumId", new { forumId = choosenForumId }).AsList();
+                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@ForumId", new { ForumId = choosenForumId }).AsList();
                 return result;
             }
         }
@@ -52,7 +52,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@forumId AND UserId = @userId", new { forumId = choosenForumId, userId = choosenUserId }).AsList();
+                var result = connection.Query<Post>("SELECT * FROM Post WHERE ForumId=@ForumId AND UserId = @UserId", new { ForumId = choosenForumId, UserId = choosenUserId }).AsList();
                 return result;
             }
         }
@@ -82,7 +82,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                var result = connection.QueryFirst<Post>("SELECT * FROM Post WHERE PostId=@id", new { id = postId });
+                var result = connection.QueryFirst<Post>("SELECT * FROM Post WHERE PostId=@Id", new { Id = postId });
                 return result;
             }
         }
@@ -128,7 +128,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
               connection.Open();
-              updatedRows = connection.Execute("UPDATE Post SET PostText = @PostText WHERE PostId = @postId", new { newPostText, choosenPostId });
+              updatedRows = connection.Execute("UPDATE Post SET PostText = @PostText WHERE PostId = @PostId", new { PostText = newPostText, PostId = choosenPostId });
             }
 
             if (updatedRows > 0)

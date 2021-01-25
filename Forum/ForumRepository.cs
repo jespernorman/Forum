@@ -42,7 +42,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                forum = connection.QueryFirst<Forum>("SELECT * FROM Forum WHERE id=@id", new { id = forumId });
+                forum = connection.QueryFirst<Forum>("SELECT * FROM Forum WHERE ForumId=@Id", new { Id = forumId });
             }
 
             return forum;
@@ -87,7 +87,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                delRows = connection.Execute(@"DELETE FROM Forum WHERE Id = @Id", new { Id = forumId });
+                delRows = connection.Execute(@"DELETE FROM Forum WHERE ForumId = @Id", new { Id = forumId });
             }
 
             if (delRows > 0)
@@ -106,7 +106,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                updatedRows = connection.Execute("UPDATE Forum SET ForumName = @forumName,UserId = @userId WHERE ForumId = @forumId", new { forumName, userId, forumId });
+                updatedRows = connection.Execute("UPDATE Forum SET ForumName = @ForumName, UserId = @UserId WHERE ForumId = @ForumId", new { ForumName = forumName, UserId = userId, ForumId = forumId });
             }
 
             if (updatedRows > 0)

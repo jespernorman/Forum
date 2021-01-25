@@ -79,12 +79,12 @@ namespace Forum
             {
                 connection.Open();
 
-                var query = "INSERT INTO User(UserName, PassWord, Create_Date) VALUES(@UserName, @PassWord, @Create_Date)";
+                var query = "INSERT INTO User(UserName, PassWord, CreateDate) VALUES(@UserName, @PassWord, @CreateDate)";
 
                 var dp = new DynamicParameters();
                 dp.Add("@UserName", userName, DbType.AnsiString, ParameterDirection.Input, 255);
                 dp.Add("@PassWord", passWord);
-                dp.Add("@Create_Date", DateTime.Now);
+                dp.Add("@CreateDate", DateTime.Now);
 
                 insertedRow = connection.Execute(query, dp);
 
@@ -109,7 +109,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                delRows = connection.Execute(@"DELETE FROM User WHERE User_Id = @Id", new { Id = userId });
+                delRows = connection.Execute(@"DELETE FROM User WHERE UserId = @Id", new { Id = userId });
             }
 
             if (delRows > 0)
@@ -128,7 +128,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                updatedRows = connection.Execute("UPDATE User SET UserName = @userName,passWord = @passWord WHERE User_Id = @userId", new { userName, passWord, userId });
+                updatedRows = connection.Execute("UPDATE User SET UserName = @UserName, PassWord = @PassWord WHERE UserId = @UserId", new { UserName = userName, PassWord = passWord, UserId = userId });
             }
 
             if (updatedRows > 0)
