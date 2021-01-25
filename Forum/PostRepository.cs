@@ -139,7 +139,7 @@ namespace Forum
             return false;
         }
     
-        public bool DeletePost(int chosenPostId)
+        public bool DeletePost(int choosenPostId)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
             connectionStringBuilder.DataSource = DBPath;
@@ -148,7 +148,7 @@ namespace Forum
 
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {            connection.Open();
-                 delRows = connection.Execute(@"DELETE FROM Post WHERE Id = @Id", new { Id = chosenPostId });
+                 delRows = connection.Execute(@"DELETE FROM Post WHERE PostId = @PostId", new { PostId = choosenPostId });
             }
 
             if (delRows > 0)

@@ -46,7 +46,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                user = connection.QueryFirst<User>("SELECT * FROM User WHERE id=@id", new { id = userId });
+                user = connection.QueryFirst<User>("SELECT * FROM User WHERE UserId=@UserId", new { UserId = userId });
             }
 
             return user;
@@ -62,7 +62,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                user = connection.QueryFirst<User>("SELECT * FROM User WHERE id=@id", new { id = userName });
+                user = connection.QueryFirst<User>("SELECT * FROM User WHERE UserName = @UserName", new { UserName = userName });
             }
 
             return user;
@@ -109,7 +109,7 @@ namespace Forum
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
-                delRows = connection.Execute(@"DELETE FROM User WHERE UserId = @Id", new { Id = userId });
+                delRows = connection.Execute(@"DELETE FROM User WHERE UserId = @UserId", new { UserId = userId });
             }
 
             if (delRows > 0)
