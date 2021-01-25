@@ -98,7 +98,7 @@ namespace Forum
             {
                 connection.Open();
 
-                var query = "INSERT INTO Post(ForumId, PostText, CreateDate, UserId) VALUES(@ForumId, @PostText, @CreateDate";
+                var query = "INSERT INTO Post(ForumId, PostText, CreateDate, UserId) VALUES(@ForumId, @PostText, @CreateDate, @UserId)";
 
                 var dp = new DynamicParameters();
                 dp.Add("@ForumId", forumId);
